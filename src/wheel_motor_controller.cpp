@@ -288,9 +288,9 @@ void MotorController::cmd_callback(const std_msgs::String::ConstPtr& msg)
 void MotorController::set_vel_callback(const geometry_msgs::Twist msg)
 {
 	// Construct and send the command strings
-	
-	L_motor = (float) -((msg.linear.x*1000 - wheelGeometryX[0]*sin(msg.angular.z)) / (2*3.1415*wheelRad) * ticksPerRev);
-	R_motor = (float)  ((msg.linear.x*1000 - wheelGeometryX[1]*sin(msg.angular.z)) / (2*3.1415*wheelRad) * ticksPerRev);
+	// The motor controller is set to be positive CW (left hand) OOPS
+	L_motor = (float)  ((msg.linear.x*1000 - wheelGeometryX[0]*sin(msg.angular.z)) / (2*3.1415*wheelRad) * ticksPerRev);
+	R_motor = (float) -((msg.linear.x*1000 - wheelGeometryX[1]*sin(msg.angular.z)) / (2*3.1415*wheelRad) * ticksPerRev);
 	//printf("saw calc = %lf\twz = %lf\tLmot = %f\tRmot = %f\n", wheelGeometryX[0]*sin(msg.angular.z), msg.angular.z, L_motor, R_motor);
 	
 }
