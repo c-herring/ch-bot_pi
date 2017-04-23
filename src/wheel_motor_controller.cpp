@@ -152,12 +152,12 @@ bool MotorController::pollEncoders()
 MotorController::MotorController()
 {
 	// Initialise geometry
-	// Left wheel is in +ve X, right is -ve
-	wheelGeometryX[0] = 90; // mm
-	wheelGeometryX[1] = -90; // mm
+	// Left wheel is in -ve X, right is +ve
+	wheelGeometryX[0] = -90; // mm
+	wheelGeometryX[1] =  90; // mm
 	
-	wheelGeometryY[0] = 90; // mm
-	wheelGeometryY[1] = -90; // mm
+	wheelGeometryY[0] = 0; // mm
+	wheelGeometryY[1] = 0; // mm
 	
 	wheelRad = 50; // mm
 	ticksPerRev = 768; // encoder ticks per revolution
@@ -288,9 +288,10 @@ void MotorController::cmd_callback(const std_msgs::String::ConstPtr& msg)
 void MotorController::set_vel_callback(const geometry_msgs::Twist msg)
 {
 	// Construct and send the command strings
-	// The motor controller is set to be positive CW (left hand) OOPS
-	L_motor = (float)  ((msg.linear.x*1000 - wheelGeometryX[0]*sin(msg.angular.z)) / (2*3.1415*wheelRad) * ticksPerRev);
-	R_motor = (float) -((msg.linear.x*1000 - wheelGeometryX[1]*sin(msg.angular.z)) / (2*3.1415*wheelRad) * ticksPerRev);
+	L_motor = (float)  ((msg.linear.x*1000 + 2*3.1415*wheelGeometryX[0]*msg.angular.z) / (2*3.1415*wheelRad) * ticksPerRev);
+	R_motor = (float) -((msg.linear.x*1000 + 2*3.1415*wheelGeometryX[1]*msg.angular.z) / (2*3.1415*wheelRad) * ticksPerRev);
+	//L_motor = (float)  ((msg.linear.x*1000 - wheelGeometryX[0]*sin(msg.angular.z)) / (2*3.1415*wheelRad) * ticksPerRev);
+	//R_motor = (float) -((msg.linear.x*1000 - wheelGeometryX[1]*sin(msg.angular.z)) / (2*3.1415*wheelRad) * ticksPerRev);
 	//printf("saw calc = %lf\twz = %lf\tLmot = %f\tRmot = %f\n", wheelGeometryX[0]*sin(msg.angular.z), msg.angular.z, L_motor, R_motor);
 	
 }
