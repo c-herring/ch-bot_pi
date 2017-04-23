@@ -180,7 +180,7 @@ MotorController::MotorController()
 	
 	// Subscribe to the command topics
 	direct_cmd = nh.subscribe<std_msgs::String>("direct_cmd", 100, &MotorController::cmd_callback, this);
-	set_vel = nh.subscribe<geometry_msgs::Twist>("set_vel", 100, &MotorController::set_vel_callback, this);
+	set_vel = nh.subscribe<geometry_msgs::Twist>("vel_set", 100, &MotorController::set_vel_callback, this);
 	//twist_vel = nh.subscribe<geometry_msgs::Twist>("twist_set", 100, &MotorController::set_twist_callback, this);
 	
 	// -------- Create the publishers --------
@@ -288,8 +288,8 @@ void MotorController::cmd_callback(const std_msgs::String::ConstPtr& msg)
 void MotorController::set_vel_callback(const geometry_msgs::Twist msg)
 {
 	// Construct and send the command strings
-	L_motor = (float)  ((msg.linear.x*1000 + 2*3.1415*wheelGeometryX[0]*msg.angular.z) / (2*3.1415*wheelRad) * ticksPerRev);
-	R_motor = (float) -((msg.linear.x*1000 + 2*3.1415*wheelGeometryX[1]*msg.angular.z) / (2*3.1415*wheelRad) * ticksPerRev);
+	L_motor = (float)  ((msg.linear.y*1000 + 2*3.1415*wheelGeometryX[0]*msg.angular.z) / (2*3.1415*wheelRad) * ticksPerRev);
+	R_motor = (float) -((msg.linear.y*1000 + 2*3.1415*wheelGeometryX[1]*msg.angular.z) / (2*3.1415*wheelRad) * ticksPerRev);
 	//L_motor = (float)  ((msg.linear.x*1000 - wheelGeometryX[0]*sin(msg.angular.z)) / (2*3.1415*wheelRad) * ticksPerRev);
 	//R_motor = (float) -((msg.linear.x*1000 - wheelGeometryX[1]*sin(msg.angular.z)) / (2*3.1415*wheelRad) * ticksPerRev);
 	//printf("saw calc = %lf\twz = %lf\tLmot = %f\tRmot = %f\n", wheelGeometryX[0]*sin(msg.angular.z), msg.angular.z, L_motor, R_motor);
