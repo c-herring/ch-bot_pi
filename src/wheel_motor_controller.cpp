@@ -63,6 +63,7 @@ class MotorController
 		double x;
 		double y;
 		double th;
+		double L; // debugging
 		ros::Time current_time, last_time;
 		
 		// Pubs
@@ -160,11 +161,13 @@ MotorController::MotorController()
 	wheelGeometryY[1] = 0; // mm
 	
 	wheelRad = 50; // mm
-	ticksPerRev = 768.0*19.0/32.0; // encoder ticks per revolution
+	//768 cpr, 19/32 gear ratio, quadrature
+	ticksPerRev = 768.0*32.0/19.0*4.0; // encoder ticks per revolution
 	
 	// Motor Velocities in encoder ticks/sec
 	L_motor = 0;
 	R_motor = 0;
+	L = 0; //debugging
 	
 	// Initialise odometry
 	rightEnc = 0;
@@ -362,7 +365,7 @@ void MotorController::setVelocities()
 void MotorController::publishOdometry()
 {
 	// Poll the encoders, if we get data then publish it
-	if (pollEncoders() | 1)
+	if (pollEncoders())
 	{
 		// Publish raw encoder data (for debugging)
 		left_encoder_pos_msg.data = leftEnc;
@@ -383,15 +386,15 @@ void MotorController::publishOdometry()
 		th += dth;
 		double dx = -d*sin(dth); // These are dx and dy in the robot local frame
 		double dy =  d*cos(dth);	// Need to convert them to odom
-		
 		// x and y in odom
 		x += dx*cos(th) - dy*sin(th);
 		y += dx*sin(th) + dy*cos(th);
-		
+		L += d_L; //debugging
 		// Get the current time and calculate dt
 		current_time = ros::Time::now();
 		double dt = (current_time - last_time).toSec();
 		last_time = current_time;
+		printf("d_L = %fl\td_R = %fl\tdth = %fl\tL = %fl\n", d_L, d_R, dth, L);
 		
 		// Generate the transform to publish over tf
 		odom_trans.header.stamp = current_time;
