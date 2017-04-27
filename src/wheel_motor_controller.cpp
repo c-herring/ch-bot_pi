@@ -86,7 +86,7 @@ class MotorController
 		float wheelGeometryX[2];
 		float wheelGeometryY[2];
 		float wheelRad;
-		int ticksPerRev;
+		float ticksPerRev;
 		
 };
 
@@ -160,7 +160,7 @@ MotorController::MotorController()
 	wheelGeometryY[1] = 0; // mm
 	
 	wheelRad = 50; // mm
-	ticksPerRev = 768; // encoder ticks per revolution
+	ticksPerRev = 768.0*19.0/32.0; // encoder ticks per revolution
 	
 	// Motor Velocities in encoder ticks/sec
 	L_motor = 0;
@@ -375,7 +375,7 @@ void MotorController::publishOdometry()
 		// RELIES ON sin(th) == th for very small th
 		// ((2*pi*r*d_enc1/tick per rev) + (2*pi*r*d_enc2/tick per rev)) /2 
 		double d_L = 2*3.1415*wheelRad/1000*(leftEnc-leftEnc_old)/ticksPerRev;
-		double d_R = 2*3.1415*wheelRad/1000*(rightEnc-rightEnc_old)/ticksPerRev;
+		double d_R = -2*3.1415*wheelRad/1000*(rightEnc-rightEnc_old)/ticksPerRev;
 		double d = (d_L + d_R)/2; //3.1415*wheelRad/1000*((leftEnc-leftEnc_old) + (rightEnc-rightEnc_old))/ticksPerRev;
 		double dth = (d_R - d_L)/(fabs(wheelGeometryX[0] - wheelGeometryX[1])/1000);
 		
@@ -483,7 +483,7 @@ int main(int argc, char** argv)
 	
 	// Create the motor controller object
 	MotorController controller;
-	ros::Rate loop_rate(10);
+	ros::Rate loop_rate(50);
 
 	
 	while (ros::ok())
